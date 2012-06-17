@@ -1,0 +1,160 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>WebRiver Configuration</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="/static/js/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="/static/js/webriver.js"></script>
+</head>
+<body style="padding-top:90px">
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="brand">WebRiver</a>
+            </div>
+        </div>
+    </div>
+    <div class="container">
+        <div class="page-header">
+            <h1>WebRiver Configuration</h1>
+        </div>
+        <p>WebRiver requires that you input some configuration options before it can work.</p>
+        <form id="configform" action="/configure" method="POST" class="well form-horizontal">
+            <fieldset>
+                <legend>Usenet</legend>
+                <table class="table"><tr><th width="50%">Main Server</th><th width="50%"><input name="unb-enabled" type="checkbox" class="input-xlarge" id="unb-enabled" onchange="toggle_backup()"/> Backup Server</th></tr><tr><td>
+                    <div class="control-group">
+                        <label class="control-label" for="un-server">Server</label>
+                        <div class="controls">
+                            <input name="un-server" type="text" class="input-xlarge" id="un-server" autofocus/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="un-username">Username</label>
+                        <div class="controls">
+                            <input name="un-username" type="text" class="input-xlarge" id="un-username"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="un-password">Password</label>
+                        <div class="controls">
+                            <input name="un-password" type="password" class="input-xlarge" id="un-password"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="un-port">Port</label>
+                        <div class="controls">
+                            <input name="un-port" type="text" class="input-xlarge" id="un-port" value="119" onkeyup="toggle_ssl(0)"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="un-ssl">SSL</label>
+                        <div class="controls">
+                            <input name="un-ssl" type="checkbox" class="input-xlarge" id="un-ssl" onchange="toggle_port(0)"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="un-connect">Connections</label>
+                        <div class="controls">
+                            <input name="un-connect" type="text" class="input-xlarge" id="un-connect" value="10"/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button type="button" class="btn" onclick="test_server(0)">Test Connection</button>
+                            <p class="help-inline" id="tested"></p>
+                        </div>
+                    </div>
+                </td>
+                <td>
+                    <div class="control-group">
+                        <label class="control-label" for="unb-server">Server</label>
+                        <div class="controls">
+                            <input name="unb-server" type="text" class="input-xlarge" id="unb-server" disabled/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="unb-username">Username</label>
+                        <div class="controls">
+                            <input name="unb-username" type="text" class="input-xlarge" id="unb-username" disabled/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="unb-password">Password</label>
+                        <div class="controls">
+                            <input name="unb-password" type="password" class="input-xlarge" id="unb-password" disabled/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="unb-port">Port</label>
+                        <div class="controls">
+                            <input name="unb-port" type="text" class="input-xlarge" id="unb-port" value="119" onkeyup="toggle_ssl(1)" disabled/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="unb-ssl">SSL</label>
+                        <div class="controls">
+                            <input name="unb-ssl" type="checkbox" class="input-xlarge" id="unb-ssl" onchange="toggle_port(1)" disabled/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <label class="control-label" for="unb-connect">Connections</label>
+                        <div class="controls">
+                            <input name="unb-connect" type="text" class="input-xlarge" id="unb-connect" value="10" disabled/>
+                        </div>
+                    </div>
+                    <div class="control-group">
+                        <div class="controls">
+                            <button type="button" id="unb-test" class="btn" onclick="test_server(1)" disabled>Test Connection</button>
+                            <p class="help-inline" id="btested"></p>
+                        </div>
+                    </div>
+                </td></tr></table>
+                <legend>WebRiver</legend>
+                <div class="control-group">
+                    <label class="control-label" for="wr-auth">Require Authentication</label>
+                    <div class="controls">
+                        <input name="wr-auth" type="checkbox" id="wr-auth" onchange="toggle_auth()"/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="wr-username">Username</label>
+                    <div class="controls">
+                        <input name="wr-username" type="text" class="input-xlarge" id="wr-username" disabled="disabled" value=""/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="wr-password">Password</label>
+                    <div class="controls">
+                        <input name="wr-password" type="password" class="input-xlarge" id="wr-password" disabled="disabled" value=""/>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="wr-pvr">PVR Mode</label>
+                    <div class="controls">
+                        <input name="wr-pvr" type="checkbox" id="wr-pvr" onchange="toggle_pvr()"/>
+                        <p class="help-inline">Saves streaming media to server, rather than discarding</p>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="wr-auto">Auto Record</label>
+                    <div class="controls">
+                        <input name="wr-auto" type="checkbox" id="wr-auto" disabled/>
+                        <p class="help-inline">Start downloading media to server automatically after adding to WebRiver (requires PVR mode)</p>
+                    </div>
+                </div>
+                <div class="control-group">
+                    <label class="control-label" for="wr-pre">Preload</label>
+                    <div class="controls">
+                        <input name="wr-pre" type="checkbox" id="wr-pre" disabled/>
+                        <p class="help-inline">Preload the beginning of media automatically after adding to WebRiver (requires PVR mode, Auto Record implies Preload)</p>
+                    </div>
+                </div>
+                <div class="form-actions">
+                    <button type="submit" class="btn btn-primary">Save Configuration</button>
+                </div>
+            </fieldset>
+        </form>
+    </div>
+</body>
+</html>

@@ -1,0 +1,290 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <title>WebRiver</title>
+    <link href="/static/css/bootstrap.min.css" rel="stylesheet" />
+    <script type="text/javascript" src="/static/js/jquery-1.7.2.min.js"></script>
+    <script type="text/javascript" src="/static/js/bootstrap.min.js"></script>
+    <script type="text/javascript" src="/static/js/webriver.js"></script>
+</head>
+<body style="padding-top:90px">
+
+    <!-- Navigation Bar -->
+    <div class="navbar navbar-fixed-top">
+        <div class="navbar-inner">
+            <div class="container">
+                <a class="brand">WebRiver</a>
+                <ul class="nav pull-left">
+                    <li class="active"><a href="#main-rivers" data-toggle="tab">Rivers</a></li>
+                    <!--<li><a href="#main-subscriptions" data-toggle="tab">Subscriptions</a></li>-->
+                    <li><a href="#main-options" data-toggle="tab" onclick="doOptions()">Options</a></li>
+                </ul>
+                <ul class="nav pull-right">
+                    <li><p class="navbar-text" style="margin-top:-1px">Add river from: </p></li>
+                    <li><a id="do-upload-fromfile" onclick="autoFile" data-toggle="modal" href="#upload-fromfile">File</a></li>
+                    <li><a data-toggle="modal" href="#upload-fromurl">Link</a></li>
+                    <li class="divider-vertical"></li>
+                    <li class="dropdown">
+                        <a id="poll" class="dropdown-toggle" data-toggle="dropdown">Refresh: 1s <b class="caret"></b></a>
+                        <ul class="dropdown-menu">
+                            <li><a onclick="setPoll(1)">1 second</a></li>
+                            <li><a onclick="setPoll(2)">2 seconds</a></li>
+                            <li><a onclick="setPoll(5)">5 seconds</a></li>
+                            <li><a onclick="setPoll(10)">10 seconds</a></li>
+                            <li><a onclick="setPoll(30)">30 seconds</a></li>
+                            <li><a onclick="setPoll(60)">1 minute</a></li>
+                        </ul>
+                    </li>
+                    <li><a id="link" data-toggle="modal" style="color:#fff;width:200px;text-align:right" href="#link-details"><i class="icon-white icon-chevron-down"></i> 0 KB/s - <i class="icon-white icon-chevron-up"></i> 0 KB/s</a></li>
+                </ul>
+            </div>
+        </div>
+    </div>
+    
+    <!-- Modal Dialogs -->
+    <div class="modal fade hide" id="upload-fromfile">
+        <div class="modal-header" id="river-upload-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>Upload .river from file</h3>
+        </div>
+        <form class="form-horizontal" id="river-upload">
+        <div class="modal-body" id="river-upload-body">
+            <input type="file" class="input-xlarge" name="river" id="river-file" />
+        </div>
+        <div class="modal-footer" id="river-upload-footer">
+            <button type="button" class="btn btn-primary" onclick="doUpload()">Upload</button>
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        </div>
+        </form>
+    </div>
+    <div class="modal fade hide" id="upload-fromurl">
+        <div class="modal-header" id="river-url-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>Upload .river from URL</h3>
+        </div>
+        <form class="form-horizontal">
+        <div class="modal-body" id="river-url-body">
+            <input type="text" id="river-url-input" class="input-xlarge" name="river"/>
+        </div>
+        <div class="modal-footer" id="river-url-footer">
+            <a href="#" class="btn btn-primary" onclick="doUrl()">Upload</a>
+            <a href="#" class="btn" data-dismiss="modal">Cancel</a>
+        </div>
+        </form>
+    </div>
+    <div class="modal fade hide" id="link-details">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>Link Details</h3>
+        </div>
+        <div class="modal-body" id="link-details-body">
+            <p>There are currently no links.</p>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn btn-primary" data-dismiss="modal">Close</a>
+        </div>
+    </div>
+    <div class="modal fade hide" id="sub-add">
+        <div class="modal-header">
+            <a class="close" data-dismiss="modal">×</a>
+            <h3>Add Subscription</h3>
+        </div>
+        <div class="modal-body">
+            <form class="form-inline">
+                <p>Search for subscriptions</p>
+                <input id="sub-add-search-input" type="text" class="input-xlarge"/> <button type="button" class="btn btn-primary">Search</button>
+                <hr />
+                <p>Enter subscription directly</p>
+                <input id="sub-add-subscribe-input" type="text" class="input-xlarge typeahead" data-provide="typeahead" onchange="onSubTextChange()"/> <button type="button" class="btn btn-primary">Subscribe</button>
+            </form>
+        </div>
+        <div class="modal-footer">
+            <a href="#" class="btn btn-primary" data-dismiss="modal">Cancel</a>
+        </div>
+    </div>
+    
+    <!-- Content -->
+    <div class="container">
+        <div class="tab-content">
+        
+            <!-- Rivers -->
+            <div class="tab-pane active" id="main-rivers">
+                <h3>Rivers</h3>
+                <table id="rivers" class="table table-striped table-bordered table-condensed">
+                    <tr><th>Name</th><th width="150">Status</th><th width="250">Progress</th><th width="1">Actions</th><th width="1"><a class="close" onclick="doClearRivers()">×</a></th></tr>
+                </table><br />
+                <h4>Logs</h4>
+                <table id="logs" class="table table-bordered table-condensed">
+                    <tr><th width="150">Type</th><th>Message</th><th width="1"><a class="close" onclick="doClearLogs()">×</a></th></tr>
+                </table>
+            </div>
+            
+            <!-- Subscriptions -->
+            <div class="tab-pane" id="main-subscriptions">
+                <h3>Subscriptions</h3>
+                The subscriptions standard has not been established yet.
+                <!--<table class="table table-striped">
+                    <tr><th>Name</th><th>Path</th><th>Catalog</th><th width="1"></th></tr>
+                    <tr>
+                        <td>The Cat Show</td>
+                        <td>tv.comedy.catshow</td>
+                        <td>RiverCat</td>
+                        <td style="white-space:nowrap"><a class="btn btn-danger btn-mini" href="#">Remove</a></td>
+                    </tr>
+                </table>
+                <a class="btn btn-info" data-toggle="modal" href="#sub-add">Add Subscription</a>
+                <br /><br /><br /><br />
+                <h3>Catalogs</h3>
+                <table class="table table-striped">
+                    <tr><th>Name</th><th>Catalog URL</th><th width="1"></th></tr>
+                    <tr>
+                        <td style="white-space:nowrap">RiverCat</td>
+                        <td>https://user:****@rivercat.se/</td>
+                        <td style="white-space:nowrap"><a class="btn btn-danger btn-mini" href="#">Remove</a></td>
+                    </tr>
+                </table>
+                <a class="btn btn-info">Add Catalog</a>-->
+            </div>
+            
+            <!-- Options -->
+            <div class="tab-pane" id="main-options">
+                <form id="configform" method="POST" class="well form-horizontal">
+                    <fieldset>
+                        <legend>Usenet</legend>
+                        <table class="table"><tr><th width="50%">Main Server</th><th width="50%"><input name="unb-enabled" type="checkbox" class="input-xlarge" id="unb-enabled" onchange="toggle_backup()"/> Backup Server</th></tr><tr><td>
+                            <div class="control-group">
+                                <label class="control-label" for="un-server">Server</label>
+                                <div class="controls">
+                                    <input name="un-server" type="text" class="input-xlarge" id="un-server" autofocus/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="un-username">Username</label>
+                                <div class="controls">
+                                    <input name="un-username" type="text" class="input-xlarge" id="un-username"/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="un-password">Password</label>
+                                <div class="controls">
+                                    <input name="un-password" type="password" class="input-xlarge" id="un-password"/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="un-port">Port</label>
+                                <div class="controls">
+                                    <input name="un-port" type="text" class="input-xlarge" id="un-port" value="119" onkeyup="toggle_ssl(0)"/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="un-ssl">SSL</label>
+                                <div class="controls">
+                                    <input name="un-ssl" type="checkbox" class="input-xlarge" id="un-ssl" onchange="toggle_port(0)"/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="un-connect">Connections</label>
+                                <div class="controls">
+                                    <input name="un-connect" type="text" class="input-xlarge" id="un-connect" value="10"/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <button type="button" class="btn" onclick="test_server(0)">Test Connection</button>
+                                    <p class="help-inline" id="tested"></p>
+                                </div>
+                            </div>
+                        </td>
+                        <td>
+                            <div class="control-group">
+                                <label class="control-label" for="unb-server">Server</label>
+                                <div class="controls">
+                                    <input name="unb-server" type="text" class="input-xlarge" id="unb-server" disabled/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="unb-username">Username</label>
+                                <div class="controls">
+                                    <input name="unb-username" type="text" class="input-xlarge" id="unb-username" disabled/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="unb-password">Password</label>
+                                <div class="controls">
+                                    <input name="unb-password" type="password" class="input-xlarge" id="unb-password" disabled/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="unb-port">Port</label>
+                                <div class="controls">
+                                    <input name="unb-port" type="text" class="input-xlarge" id="unb-port" value="119" onkeyup="toggle_ssl(1)" disabled/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="unb-ssl">SSL</label>
+                                <div class="controls">
+                                    <input name="unb-ssl" type="checkbox" class="input-xlarge" id="unb-ssl" onchange="toggle_port(1)" disabled/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <label class="control-label" for="unb-connect">Connections</label>
+                                <div class="controls">
+                                    <input name="unb-connect" type="text" class="input-xlarge" id="unb-connect" value="10" disabled/>
+                                </div>
+                            </div>
+                            <div class="control-group">
+                                <div class="controls">
+                                    <button type="button" id="unb-test" class="btn" onclick="test_server(1)" disabled>Test Connection</button>
+                                    <p class="help-inline" id="btested"></p>
+                                </div>
+                            </div>
+                        </td></tr></table>
+                        <legend>WebRiver</legend>
+                        <div class="control-group">
+                            <label class="control-label" for="wr-auth">Require Authentication</label>
+                            <div class="controls">
+                                <input name="wr-auth" type="checkbox" id="wr-auth" onchange="toggle_auth()"/>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="wr-username">Username</label>
+                            <div class="controls">
+                                <input name="wr-username" type="text" class="input-xlarge" id="wr-username" disabled="disabled" value=""/>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="wr-password">Password</label>
+                            <div class="controls">
+                                <input name="wr-password" type="password" class="input-xlarge" id="wr-password" disabled="disabled" value=""/>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="wr-pvr">PVR Mode</label>
+                            <div class="controls">
+                                <input name="wr-pvr" type="checkbox" id="wr-pvr" onchange="toggle_pvr()"/>
+                                <p class="help-inline">Saves streaming media on server, rather than discarding</p>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="wr-auto">Auto Record</label>
+                            <div class="controls">
+                                <input name="wr-auto" type="checkbox" id="wr-auto" disabled/>
+                                <p class="help-inline">Start downloading media to server automatically after adding to WebRiver (requires PVR mode)</p>
+                            </div>
+                        </div>
+                        <div class="control-group">
+                            <label class="control-label" for="wr-pre">Preload</label>
+                            <div class="controls">
+                                <input name="wr-pre" type="checkbox" id="wr-pre" disabled/>
+                                <p class="help-inline">Preload the beginning of media automatically after adding to WebRiver (requires PVR mode, Auto Record implies Preload)</p>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="submit" class="btn btn-primary">Save Configuration</button>
+                        </div>
+                    </fieldset>
+                </form>
+            </div>
+        </div>
+    </div>
+</body>

@@ -1,0 +1,21 @@
+COPYDOWN (C) You
+All code related to WebRiver and created by ISC-USENET
+Is released fully into the public domain
+
+WebRiver Release 1 - June 17, 2012
+----------------------------------
+
+This is the initial release of WebRiver, the ISC-USENET web-based River streamer.
+Consider this software to be of ALPHA quality.
+
+[REQUIREMENTS]
+* Python 2.7
+* gevent 0.13.0 or later
+* flask 0.6 or later
+* python-yenc
+* par2
+
+
+[USAGE]
+There are no command-line arguments.
+All configuration is done with the web interface.
