@@ -612,7 +612,7 @@ def configure():
         config.add_section('usenet')
     config.set('usenet', 'server', request.form['un-server'])
     config.set('usenet', 'username', request.form['un-username'])
-    if not no_redirect and request.form['un-password'] == 'WR_DO_NOT_CHANGE_THIS_PASSWORD_U':
+    if not (no_redirect and request.form['un-password'] == 'WR_DO_NOT_CHANGE_THIS_PASSWORD_U'):
         config.set('usenet', 'password', request.form['un-password'])
     config.set('usenet', 'port', request.form['un-port'])
     config.set('usenet', 'connections', request.form['un-connect'])
@@ -622,7 +622,7 @@ def configure():
             config.add_section('usenet-backup')
         config.set('usenet-backup', 'server', request.form['unb-server'])
         config.set('usenet-backup', 'username', request.form['unb-username'])
-        if not no_redirect and request.form['unb-password'] == 'WR_DO_NOT_CHANGE_THIS_PASSWORD_UB':
+        if not (no_redirect and request.form['unb-password'] == 'WR_DO_NOT_CHANGE_THIS_PASSWORD_UB'):
             config.set('usenet-backup', 'password', request.form['unb-password'])
         config.set('usenet-backup', 'port', request.form['unb-port'])
         config.set('usenet-backup', 'connections', request.form['unb-connect'])
@@ -635,7 +635,7 @@ def configure():
     if 'wr-auth' in request.form:
         config.set('webriver', 'auth', 'on')
         config.set('webriver', 'username', request.form['wr-username'])
-        if not no_redirect and request.form['wr-password'] == 'WR_DO_NOT_CHANGE_THIS_PASSWORD_WR':
+        if not (no_redirect and request.form['wr-password'] == 'WR_DO_NOT_CHANGE_THIS_PASSWORD_WR'):
             config.set('webriver', 'password', request.form['wr-password'])
     else:
         config.set('webriver', 'auth', 'off')
