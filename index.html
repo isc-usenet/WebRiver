@@ -1,0 +1,149 @@
+<!DOCTYPE html>
+<html>
+
+  <head>
+    <meta charset='utf-8' />
+    <meta http-equiv="X-UA-Compatible" content="chrome=1" />
+    <meta name="description" content="WebRiver : Instructions for using WebRiver" />
+
+    <link rel="stylesheet" type="text/css" media="screen" href="stylesheets/stylesheet.css">
+
+    <title>WebRiver</title>
+  </head>
+
+  <body>
+
+    <!-- HEADER -->
+    <div id="header_wrap" class="outer">
+        <header class="inner">
+          <a id="forkme_banner" href="https://github.com/isc-usenet/WebRiver">View on GitHub</a>
+
+          <h1 id="project_title">WebRiver</h1>
+          <h2 id="project_tagline">Instructions for using WebRiver</h2>
+
+            <section id="downloads">
+              <a class="zip_download_link" href="https://github.com/isc-usenet/WebRiver/zipball/master">Download this project as a .zip file</a>
+              <a class="tar_download_link" href="https://github.com/isc-usenet/WebRiver/tarball/master">Download this project as a tar.gz file</a>
+            </section>
+        </header>
+    </div>
+
+    <!-- MAIN CONTENT -->
+    <div id="main_content_wrap" class="outer">
+      <section id="main_content" class="inner">
+        <p>NOTE: WebRiver is still in an ALPHA state. If you run into bugs or problems with the software, please create an issue on the github issue tracker.</p>
+
+<h2>Introduction</h2>
+
+<p>WebRiver is an HTTP and Web-based download/streaming tool for River files. The web interface shows the bandwidth being used both from Usenet downloading, as well as from the clients that are streaming files. It supports "PVR mode", which means once portions of the file are downloaded from Usenet, they are stored on the hard drive so future views won't download from Usenet again. It also allows automatic preloading, so when you begin to stream your media, it starts immediately.
+Notable features of WebRiver are:</p>
+
+<ul>
+<li>HTTP interface to River files, which is supported by a large amount of media players</li>
+<li>Lightweight, should run fine within 100MB of RAM and with a very underpowered CPU</li>
+<li>Fast, responsive interface (interface response time normally less than 3ms)</li>
+<li>Stream multiple files at once, or the same file seeked to different places</li>
+<li>Record media files to WebRiver for later streaming</li>
+<li>Bandwidth monitoring of both downloading from Usenet and uploading to HTTP clients</li>
+<li>Automatic, on-the-fly PAR2 recovery and handling</li>
+<li>Download River files from HTTP or via RLinks, or upload directly to WebRiver</li>
+<li>Backup server option for missing articles from different Usenet provider</li>
+<li>Proper cp437 NFO viewer</li>
+</ul><h2>Requirements</h2>
+
+<ul>
+<li>Python 2.7</li>
+<li>gevent</li>
+<li>flask</li>
+<li>python-yenc</li>
+</ul><h2>Downloading</h2>
+
+<p>As WebRiver is currently in an ALPHA state, the only way to get it is to download a tarball of HEAD or clone from GitHub.</p>
+
+<p>If you know how to use git, clone from <a href="https://github.com/isc-usenet/WebRiver.git">https://github.com/isc-usenet/WebRiver.git</a></p>
+
+<p>Otherwise, download the HEAD tarball from <a href="https://github.com/isc-usenet/WebRiver/tarball/master">https://github.com/isc-usenet/WebRiver/tarball/master</a></p>
+
+<p>You can also download the tarball or zip archive from the top of this page.</p>
+
+<h2>Installing</h2>
+
+<p>As WebRiver is currently in an ALPHA state, there is no method to install it. Enter the directory that WebRiver resides in and run the command:</p>
+
+<p><code>python2.7 webriver.py</code></p>
+
+<p>This will give you a link to the web interface, which can be used to configure WebRiver.</p>
+
+<h2>Configuration</h2>
+
+<p>Configuration of WebRiver is fairly self-explanitory</p>
+
+<p><img src="images/configuration.png" alt="Configuration page"></p>
+
+<h3>Main Server</h3>
+
+<p>All Usenet downloading will be done from the Main Server - that is, the one on the left. At your option, you can test the server to make sure you entered the correct credentials.</p>
+
+<h3>Backup Server</h3>
+
+<p>If you have a backup server you want to use, Check the box beside Backup Server on the right, and it will allow you to enter in the settings for that server. At your option, you can test the server to make sure you entered the correct credentials.</p>
+
+<h3>Require Authentication</h3>
+
+<p>If you want WebRiver to be password-protected by HTTP authentication (media streams are not affected by this), you have the option to set a username and password when thie checkbox is checked.</p>
+
+<h3>PVR Mode</h3>
+
+<p>Saves downloaded data to the hard drive. If a media file is streamed twice when this is enabled, the first time will download from Usenet and the second time will load from the hard drive. It can be used to save bandwidth when files are frequently watched more than once.</p>
+
+<h3>Auto Record (Requires PVR Mode)</h3>
+
+<p>When a River file is added to the WebRiver interface with this option checked, WebRiver will automatically record the entire file to the hard drive, rather than streaming it on demand. This can be stopped at any time with the stop button on the WebRiver interface.</p>
+
+<h3>Preload (Requires PVR Mode)</h3>
+
+<p>When a River file is added to the WebRiver interface with this option checked, WebRiver will automatically record the first several megabytes of the file, then stop when that has been downloaded. This is recommended, as it allows streams to start immediately. If this option is not checked, streams should normally start in between 2-10 seconds depending on the internet connection. If the
+Auto Record option is also checked, the Preload option will be ignored.</p>
+
+<p>Once you have set up WebRiver to your liking, you may hit "Save Configuration". This will bring you to the WebRiver main interface.</p>
+
+<h2>Using WebRiver</h2>
+
+<p><img src="images/rivers.png" alt="Rivers page"></p>
+
+<p>This is the main WebRiver interface. At the top you have two tabs: Rivers and Options.
+You can also add new River files to the interface by uploading from a local file as well as by making WebRiver download it from an HTTP link, FTP link, or from Usenet itself via a River Link.
+You have the ability to change the refresh rate of the interface, which is one second by default. At the very right of the top bar, you have an indicator that shows both the download rate from Usenet (downward chevron), and the upload rate to any streaming clients (upward chevron). By clicking on this, you can view all active clients currently streaming media from the WebRiver instance.</p>
+
+<p><img src="images/linkdetails.png" alt="Link Details"></p>
+
+<h3>Rivers</h3>
+
+<p>The River tab shows all of the Rivers currently loaded in WebRiver. It shows the name (or filename if the River file has no metadata), the status of said River (Idle, Streaming, Recording, Complete), the position that the streaming client is currently at (or 99% if more than one client), any available actions for this River, and a button to remove the River.</p>
+
+<p>The topmost remove button clears all River files. All Rivers will have a Download action. You can left-click this to download straight from your web browser. If, however, you want to stream this in VLC, mplayer or any other client, make sure to right-click the download button, choose "Copy Link Location" or "Copy URL" and paste it into the client or media player.</p>
+
+<p>If PVR mode is enabled, you will also have a Record action, which allows you to save the media to disk in the background without needing to stream or download it. Some river files will also have NFO files in them, which will show up in Actions as an NFO button.</p>
+
+<p>As this is an ALPHA release, the logs are not currently used, however they are a mechanism to give feedback to the user when something goes wrong. They can be multi-line and can go into as much detail as needed. As time goes on, this feature will be used more often, though currently the majority of things that go wrong will be shown in the console.</p>
+
+<h3>Options</h3>
+
+<p><img src="images/options.png" alt="Options page"></p>
+
+<p>This page is laid out the same as the initial configuration page that shows up when you start WebRiver for the first time. The main difference with this page that must be kept in mind, however, is that the server settings will not come into effect until WebRiver is restarted. We may be able to change this in a future non-ALPHA version, but is currently not a priority.</p>
+      </section>
+    </div>
+
+    <!-- FOOTER  -->
+    <div id="footer_wrap" class="outer">
+      <footer class="inner">
+        <p class="copyright">WebRiver maintained by <a href="https://github.com/isc-usenet">isc-usenet</a></p>
+        <p>Published with <a href="http://pages.github.com">GitHub Pages</a></p>
+      </footer>
+    </div>
+
+    
+
+  </body>
+</html>
