@@ -34,7 +34,6 @@ function initState(data, textStatus) {
     session = data['session'];
     for (i in data['rivers']) {
         var r = data['rivers'][i];
-        console.info(JSON.stringify(r));
         rivers[i] = {'name': r['name'], 'filename': r['filename']};
         newRiverRow(i, r['name'], r['filename'], r['progress'], r['isDownloading'], r['isRecording'], r['nfo']);
     }
@@ -87,7 +86,7 @@ function updateState2(data, textStatus) {
         }
         for (i in data['rivers']) {
             var r = data['rivers'][i];
-            console.info(JSON.stringify(r));
+            rivers[i] = {'name': r['name'], 'filename': r['filename']};
             newRiverRow(i, r['name'], r['filename'], r['progress'], r['isDownloading'], r['isRecording'], r['nfo']);
         }
         for (i in data['logs']) {
@@ -313,8 +312,6 @@ function uploadHidden() {
 }
 
 function doUrl() {
-    console.info('doUrl');
-    console.info($('#river-url-input').val());
     $.post('/add_url', {'river': $('#river-url-input').val()}, doUrl2, 'json');
 }
 
@@ -331,6 +328,7 @@ function doChoose(data, which) {
     if (data['files'].length == 1) {
         var file = data['files'][0];
         doAdd([file['id']], which);
+        rivers[file['id']] = {'name': file['name'], 'filename': file['filename']};
         newRiverRow(file['id'], file['name'], file['filename'], 0, false, false, file['nfo']);
     }
     else {
@@ -368,9 +366,6 @@ function urlShown() {
 }
 
 function newRiverRow(id, name, filename, progress, isDownloading, isRecording, nfo) {
-    if (nfo != null) {
-        console.info('we have nfo');
-    }
     if ($('#river-row'+id.toString()).length > 0) return;
     var statusString = (progress == 100?'Complete':(isDownloading?'Streaming':(isRecording?'Recording':'Idle')))+' - '+progress.toString()+'%';
     var statusClass = 'progress progress-striped '+(progress.toString() == 100?'progress-success':(isDownloading?'active':(isRecording?'progress-warning active':'progress-danger')));
@@ -426,16 +421,28 @@ function doDeleteLogRow(id) {
 }
 
 function doDeleteRiverRow(id) {
-    var answer = confirm('Are you sure you want to remove this river?\r\nThis will remove all PVR\'d data.')
+    if (!pvr) {
+        var answer = confirm('Are you sure you want to remove this river?\r\n');
+    }
+    else {
+        var answer = confirm('Are you sure you want to remove this river?\r\nThis will remove all PVR\'d data.');
+    }
     if (answer) {
         deleteRiverRow(id);
+        delete rivers[id];
         $.getJSON('/delete_river?session='+session+'&row='+id);
+        return;
     }
 }
 
 function doClearRivers() {
     if ($('#rivers tr').length == 1) return;
-    var answer = confirm('Are you sure you want to clear all rivers?\r\nThis will remove all PVR\'d data.')
+    if (!pvr) {
+        var answer = confirm('Are you sure you want to clear all rivers?');
+    }
+    else {
+        var answer = confirm('Are you sure you want to clear all rivers?\r\nThis will remove all PVR\'d data.');
+    }
     if (answer) {
         $.getJSON('/clear_rivers?session='+session);
         clearRivers();
@@ -614,9 +621,10 @@ function validate_configuration() {
             var form = new FormData(document.getElementById('configform'));
             var xhr = new XMLHttpRequest();
             xhr.open('POST', '/configure', true);
-            xhr.send(form)
-            alert('Saved');
+            xhr.send(form);
+            alert('Saved. Any server changes require WebRiver to be restarted.');
             return false;
         }
     return !failed;
 }
+

@@ -290,7 +290,9 @@ def grab_rlink(link):
     if not crc == hcrc:
         print "INVALID RLINK CRC %s HCRC %s" % (crc, hcrc)
         print "Ignoring until release 2"
-    return bz2.decompress(data)
+    data = bz2.decompress(data)
+    print data
+    return data
     
 def grab_river(river):
     global river_queue
@@ -381,11 +383,17 @@ def process_river(filename, data):
         if 'filemeta' in i:
             if 'name' in i['filemeta']:
                 fname = i['filemeta']['name']
+            elif 'name' in data['rivermeta']:
+                fname = data['rivermeta']['name']
+                i['filemeta']['name'] = fname
             else:
                 fname = i['name']
                 
             if 'description' in i['filemeta']:
                 desc = i['filemeta']['description']
+            elif 'description' in data['rivermeta']:
+                desc = data['rivermeta']['description']
+                i['filemeta']['description'] = desc
             else:
                 desc = fname
                 
@@ -578,6 +586,7 @@ def test_connection():
         
 @app.route('/configure', methods=['POST'])
 def configure():
+    global dlayer, clayer, flayer
     logging.info('Validating Configuration')
     no_redirect = False
     if is_configured():
@@ -644,9 +653,16 @@ def configure():
         config.set('webriver', 'pre', 'off')
     config.write(open(os.path.expanduser('~/.webriver/webriver.cfg'),'w'))
     logging.info('Configuration saved')
+    
     if no_redirect:
         return "configured"
     else:
+        init_bg_queue()
+        load_metadata()
+        dlayer = DecodeLayer(river_queue)
+        clayer = CacheLayer(dlayer)
+        flayer = FileLayer(clayer)
+        gevent.spawn(timer_calculate_bandwidth)
         return redirect(url_for('main'))
 
 @app.route('/add_upload', methods=['POST'])
@@ -732,7 +748,7 @@ def play(rid, filename):
                 rivers[rid]['progress'] = int(float(playfile.pos) / float(playfile.fsize) * 100.0)
                 rivers[rid]['update'] += 1
                 
-    headers = {'Content-Length': playfile.fsize}
+    headers = {'Content-Length': playfile.fsize, 'Accept-Range': 'bytes'}
     if end == None:
         end = playfile.fsize-1
     if start > playfile.fsize:
@@ -929,9 +945,11 @@ class CacheLayer:
             if not location:
                 location = os.path.expanduser('~/.webriver/downloaded/')
             self.location = location
+            self.maxcache = 5
         else:
             self.store = self.memstore
             self.grab = self.memgrab
+            self.maxcache = 10
 
     def get_article(self, rid, segments, path):
         data = self.grab(rid, segments, path)
@@ -1025,6 +1043,8 @@ class CacheLayer:
         while True:
             try:
                 path = queue.get(timeout=10)
+                if not rivers[rid]['isRecording']:
+                    return
                 if path == 0:
                     return
                 res, f = self.get_article(rid, segments, path)
@@ -1047,7 +1067,6 @@ class CacheLayer:
             os.mkdir(self.location+rid+'/recover')
         seg = path[0]
         s = segments[seg]
-        print repr(s)
         outfile = open(self.location+rid+'/recover/'+s['name'], 'w')
         arts_in = {}
         pars_in = {}
@@ -1083,7 +1102,6 @@ class CacheLayer:
         for i in range(len(s['articles'])):
             data = infile.read(s['articles'][i]['bytes'])
             arts_out[i] = data
-            print s['articles'][i]['bytes'], len(data)
             self.store(rid, segments, [seg, i], data, True)
         return arts_out[path[1]]
         shutil.rmtree(self.location+rid+'/recover/')
@@ -1116,7 +1134,7 @@ class CacheLayer:
         if not messageid in self.hashcache or force:
             self.hashcache[messageid] = (True, data)
             self.rollcache.append(messageid)
-            if len(self.rollcache) > 10:
+            if len(self.rollcache) > self.maxcache:
                 rem = self.rollcache.pop(0)
                 del self.hashcache[rem]
     
@@ -1210,7 +1228,7 @@ class UpstreamNNTP:
             data = data[sent:]
         self.sock.send("\r\n.\r\n")
         result = self.sock.recv(16384)
-        if result[:3] == '441':
+        if result[0] == '4':
             raise Exception, "NNTP Error %s" % repr(result)
         return result[:-2]
 
@@ -1224,7 +1242,7 @@ class UpstreamNNTP:
             raise IOError, "No such article"
         elif output[:3] == '412':
             raise Exception, "Not in a newsgroup"
-        elif output[:1] == '4':
+        elif output[0] == '4':
             raise Exception, output
         if not output[-5:] == '\r\n.\r\n':
             while True:
@@ -1399,8 +1417,10 @@ if __name__ == '__main__':
         clayer = CacheLayer(dlayer)
         flayer = FileLayer(clayer)
         gevent.spawn(timer_calculate_bandwidth)
-    print "Ready."
+    port = 5000
+    print "Ready at http://localhost:%d/" % port
     try:
-        WSGIServer(('',5000),app).serve_forever()
+        WSGIServer(('',port),app).serve_forever()
     except:
         save_metadata()
+
